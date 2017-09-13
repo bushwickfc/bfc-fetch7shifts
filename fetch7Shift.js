@@ -12,7 +12,11 @@ function fetch7Shifts() {
   
   var shift = '6435753';
   
-  var url = 'https://api.7shifts.com/v1/shifts' + '/' + shift;
+  var limit = '5' // Must not exceed 500, problems with > 150
+  
+  var date = '2017-08-08' // YYYY-MM-DD
+  
+  var url = 'https://api.7shifts.com/v1/shifts/?start[gte]=' + date + '&limit=' + limit;
   
   var response = UrlFetchApp.fetch(url, params);
   
@@ -21,22 +25,31 @@ function fetch7Shifts() {
   var obj = JSON.parse(json);
   var str = JSON.stringify(json);
   
-
-  for (var key in obj.data.shift) {
-    if (obj.data.shift.hasOwnProperty(key)) {
-      Logger.log(key + " -> " + obj.data.shift[key]);
-    }
-  }
-
-  //// OLD CODE ////
-
-  //var reponse = UrlFetchApp.fetch(url, params);
+  var recentShifts = obj.data.map(function(key) {
+    return key.shift
+  })
   
-  //var query = '"Apps Script" stars:">=100"';
-  
+  var shiftObjArray = recentShifts.map(function(shiftDetails) {
+    return new Shift(shiftDetails.user_id, shiftDetails.start, shiftDetails.end, shiftDetails.id, shiftDetails.role_id)
+    
+    // Currently id is returning the incorrect value.
+    // should be '32689822' but is currently '3.3942553E7'
+    
+    //user_id:  537402   
+    //start:  "2017-08-09 17:30:00"
+    //end:  "2017-08-09 21:30:00"
+    //id:  33897520
+    //role_id:  65737
+  }) 
+}
 
-  
-  //'https://api.github.com/search/repositories'
-  //+ '?sort=stars'
-  //+ '&q=' + encodeURIComponent(query);
+  console.log(shiftObjArray)
+
+function Shift(userId, start, end, ShiftId, role_id) {  
+  this.userId = userId;
+  this.start = start;
+  this.end = end;
+  this.shiftId = this.shiftId
+  this.role_id = this.role_id
+  this.calculateHours = function() {}
 }
