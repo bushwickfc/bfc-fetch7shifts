@@ -10,13 +10,10 @@ function fetch7Shifts() {
     "headers": headers
   };
   
-  var shift = '6435753';
+  // Limit must be < 500, problems with > 150 // YYYY-MM-DD // deep=1 returns associated objs like User info
+  var limit = '5', date = '2017-08-08', deep = '&deep=1' 
   
-  var limit = '5' // Must not exceed 500, problems with > 150
-  
-  var date = '2017-08-08' // YYYY-MM-DD
-  
-  var url = 'https://api.7shifts.com/v1/shifts/?start[gte]=' + date + '&limit=' + limit;
+  var url = 'https://api.7shifts.com/v1/shifts/?start[gte]=' + date + '&limit=' + limit + deep;
   
   var response = UrlFetchApp.fetch(url, params);
   
@@ -25,31 +22,33 @@ function fetch7Shifts() {
   var obj = JSON.parse(json);
   var str = JSON.stringify(json);
   
+  
+  // Can this be done a better way? Should we make a User object and assign recent shifts as User.shifts?
   var recentShifts = obj.data.map(function(key) {
-    return key.shift
+    return key
   })
   
+  Logger.log(recentShifts)
   var shiftObjArray = recentShifts.map(function(shiftDetails) {
-    return new Shift(shiftDetails.user_id, shiftDetails.start, shiftDetails.end, shiftDetails.id, shiftDetails.role_id)
-    
-    // Currently id is returning the incorrect value.
-    // should be '32689822' but is currently '3.3942553E7'
-    
-    //user_id:  537402   
-    //start:  "2017-08-09 17:30:00"
-    //end:  "2017-08-09 21:30:00"
-    //id:  33897520
-    //role_id:  65737
+    return new Shift(shiftDetails.user.id, 
+                     shiftDetails.user.firstname,
+                     shiftDetails.user.lastname,
+                     shiftDetails.shift.start, 
+                     shiftDetails.shift.end, 
+                     shiftDetails.shift.id, 
+                     shiftDetails.shift.role_id)
   }) 
+  console.log(shiftObjArray)
+  
 }
 
-  console.log(shiftObjArray)
-
-function Shift(userId, start, end, ShiftId, role_id) {  
+function Shift(userId, userFirstName, userLastName, start, end, shiftId, roleId) {  
   this.userId = userId;
+  this.firstName = userFirstName;
+  this.lastName = userLastName
   this.start = start;
   this.end = end;
-  this.shiftId = this.shiftId
-  this.role_id = this.role_id
+  this.shiftId = shiftId
+  this.roleId = roleId
   this.calculateHours = function() {}
 }
