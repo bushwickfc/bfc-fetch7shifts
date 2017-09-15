@@ -20,23 +20,35 @@ function fetch7Shifts() {
   // Make request to API and get response before this point.
   var json = response.getContentText();
   var obj = JSON.parse(json);
-  var str = JSON.stringify(json);
+  // var str = JSON.stringify(json);
   
   
   // Can this be done a better way? Should we make a User object and assign recent shifts as User.shifts?
-  var recentShifts = obj.data.map(function(key) {
+  var shiftAndAssocObjs = obj.data.map(function(key) {
     return key
+    
+// Shape of jsonObj    
+//   jsonPayload: {
+//       data: [
+//         0: {
+//           department: {…}      
+//           location: {…}      
+//           role: {…}      
+//           shift: {…}      
+//           user: {…}    
+//      }
+//        1: {}
   })
   
-  Logger.log(recentShifts)
-  var shiftObjArray = recentShifts.map(function(shiftDetails) {
-    return new Shift(shiftDetails.user.id, 
-                     shiftDetails.user.firstname,
-                     shiftDetails.user.lastname,
-                     shiftDetails.shift.start, 
-                     shiftDetails.shift.end, 
-                     shiftDetails.shift.id, 
-                     shiftDetails.shift.role_id)
+  Logger.log(shiftAndAssocObjs)
+  var shiftObjArray = shiftAndAssocObjs.map(function(objDetails) {
+    return new Shift(objDetails.user.id, 
+                     objDetails.user.firstname,
+                     objDetails.user.lastname,
+                     objDetails.shift.start, 
+                     objDetails.shift.end, 
+                     objDetails.shift.id, 
+                     objDetails.shift.role_id)
   }) 
   console.log(shiftObjArray)
   
