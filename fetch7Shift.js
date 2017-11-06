@@ -1,5 +1,5 @@
 function fetch7Shifts() {
-  // set up so that we can send over basic auth to the API
+  // Basic auth headers for API
   var apikey = ''
   var headers = {
     "Authorization" : "Basic " + Utilities.base64Encode(apikey + ':')
@@ -11,36 +11,36 @@ function fetch7Shifts() {
   };
   
   // Limit must be < 500, problems with > 150 // YYYY-MM-DD // deep=1 returns associated objs like User info
-  var limit = '5', date = '2017-08-08', deep = '&deep=1' 
+  var limit = '&limit=5', date = 'start[gte]=2017-10-01', includeAssocObjs = '&deep=1'
+  var excludeOpenShifts = '&open=0', excludeDeletedShifts = '&deleted=0'
+  var queries = date + limit + includeAssocObjs + excludeOpenShifts + excludeDeletedShifts;
   
-  var url = 'https://api.7shifts.com/v1/shifts/?start[gte]=' + date + '&limit=' + limit + deep;
+  var url = 'https://api.7shifts.com/v1/shifts/?' + queries;
   
+  // Make request to API and get response
   var response = UrlFetchApp.fetch(url, params);
   
-  // Make request to API and get response before this point.
-  var json = response.getContentText();
-  var obj = JSON.parse(json);
-  // var str = JSON.stringify(json);
-  
+ // Parse JSON string to JSON Obj
+  var jsonString = response.getContentText();
+  var jsonObj = JSON.parse(jsonString);
   
   // Can this be done a better way? Should we make a User object and assign recent shifts as User.shifts?
   var shiftAndAssocObjs = obj.data.map(function(key) {
     return key
     
-// Shape of jsonObj    
-//   jsonPayload: {
-//       data: [
-//         0: {
-//           department: {…}      
-//           location: {…}      
-//           role: {…}      
-//           shift: {…}      
-//           user: {…}    
-//      }
-//        1: {}
+    // Shape of jsonObj    
+    //   jsonPayload: {
+    //       data: [
+    //         0: {
+    //           department: {…}      
+    //           location: {…}      
+    //           role: {…}      
+    //           shift: {…}      
+    //           user: {…}    
+    //      }
+    //        1: {}
   })
   
-  Logger.log(shiftAndAssocObjs)
   var shiftObjArray = shiftAndAssocObjs.map(function(objDetails) {
     return new Shift(objDetails.user.id, 
                      objDetails.user.firstname,
@@ -49,8 +49,7 @@ function fetch7Shifts() {
                      objDetails.shift.end, 
                      objDetails.shift.id, 
                      objDetails.shift.role_id)
-  }) 
-  console.log(shiftObjArray)
+  })
   
 }
 
