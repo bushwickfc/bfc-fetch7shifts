@@ -29,16 +29,16 @@ function fetch7Shifts() {
 
 function buildShifts(jsonObj) {
  // Map individual shifts and their assoc. objects to an array
-  var shiftAndAssocObjs = jsonObj.data.map(function(shiftData) {
+  var shiftObjsArray = jsonObj.data.map(function(shiftData) {
      return new Shift(shiftData.user.id, 
-                     shiftData.user.firstname,
-                     shiftData.user.lastname,
-                     shiftData.shift.start, 
-                     shiftData.shift.end, 
-                     shiftData.shift.id, 
-                     shiftData.shift.role_id)
+                      shiftData.user.firstname,
+                      shiftData.user.lastname,
+                      shiftData.shift.start, 
+                      shiftData.shift.end, 
+                      shiftData.shift.id, 
+                      shiftData.shift.role_id)
   })
-  return shiftAndAssocObjs
+  return shiftObjsArray
 }
 
 function insertHoursWorked() {  
