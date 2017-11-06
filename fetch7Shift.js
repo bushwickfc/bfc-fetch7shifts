@@ -24,33 +24,31 @@ function fetch7Shifts() {
   var jsonString = response.getContentText();
   var jsonObj = JSON.parse(jsonString);
   
-  // Can this be done a better way? Should we make a User object and assign recent shifts as User.shifts?
-  var shiftAndAssocObjs = obj.data.map(function(key) {
-    return key
-    
-    // Shape of jsonObj    
-    //   jsonPayload: {
-    //       data: [
-    //         0: {
-    //           department: {…}      
-    //           location: {…}      
-    //           role: {…}      
-    //           shift: {…}      
-    //           user: {…}    
-    //      }
-    //        1: {}
+  return jsonObj
+}
+
+function buildShifts(jsonObj) {
+ // Map individual shifts and their assoc. objects to an array
+  var shiftAndAssocObjs = jsonObj.data.map(function(shiftData) {
+     return new Shift(shiftData.user.id, 
+                     shiftData.user.firstname,
+                     shiftData.user.lastname,
+                     shiftData.shift.start, 
+                     shiftData.shift.end, 
+                     shiftData.shift.id, 
+                     shiftData.shift.role_id)
+  })
+  return shiftAndAssocObjs
+}
+
+function insertHoursWorked() {  
+  var shiftsArray = buildShifts(fetch7Shifts())
+  shiftsArray.forEach(function(shift) {
+    Logger.log("Member: " + shift.firstName + " " + shift.lastName + " worked " + shift.hoursWorked()  + " hours")
   })
   
-  var shiftObjArray = shiftAndAssocObjs.map(function(objDetails) {
-    return new Shift(objDetails.user.id, 
-                     objDetails.user.firstname,
-                     objDetails.user.lastname,
-                     objDetails.shift.start, 
-                     objDetails.shift.end, 
-                     objDetails.shift.id, 
-                     objDetails.shift.role_id)
-  })
-  
+  // TODO
+  // * Insert hours worked to proper cells
 }
 
 function Shift(userId, userFirstName, userLastName, start, end, shiftId, roleId) {  
@@ -61,5 +59,20 @@ function Shift(userId, userFirstName, userLastName, start, end, shiftId, roleId)
   this.end = end;
   this.shiftId = shiftId
   this.roleId = roleId
-  this.calculateHours = function() {}
+  this.hoursWorked = function() {
+    var secondsWorked = this.convertTimeToSecs(this.end) - this.convertTimeToSecs(this.start);
+    var numOfSeconds = Number(secondsWorked);
+
+    return Math.floor(numOfSeconds / 3600)
+  }
+  this.convertTimeToSecs = function(date) {
+    var time = date.split(' ')[1]
+    var [hours, minutes, seconds] = time.split(/:/);
+
+    var durationInSec = hours * 60 * 60 + minutes * 60 + (+seconds);
+    return durationInSec
+  }
 }
+
+// Call function to insert into proper cells
+insertHoursWorked()
