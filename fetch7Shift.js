@@ -44,7 +44,7 @@ function buildShifts(jsonObj) {
 function insertHoursWorked() {  
   var shiftsArray = buildShifts(fetch7Shifts())
   shiftsArray.forEach(function(shift) {
-    Logger.log("Member: " + shift.firstName + " " + shift.lastName + " worked " + shift.hoursWorked()  + " hours")
+    Logger.log("Member: " + shift.memberFirstName + " " + shift.memberLastName + " worked " + shift.hoursWorked()  + " hours")
   })
   
   // TODO
@@ -53,8 +53,8 @@ function insertHoursWorked() {
 
 function Shift(userId, userFirstName, userLastName, start, end, shiftId, roleId) {  
   this.userId = userId;
-  this.firstName = userFirstName;
-  this.lastName = userLastName
+  this.memberFirstName = userFirstName;
+  this.memberLastName = userLastName
   this.start = start;
   this.end = end;
   this.shiftId = shiftId
