@@ -1,29 +1,51 @@
-function insertHoursWorked() {
-  var jsonObj = parseJSON( fetch7Shifts() )
-  var shiftsArray = buildShiftObjs( jsonObj )
-  shiftsArray.forEach( function( shift ) {
-    //Logger.log("Member: " + shift.memberFirstName + " " + shift.memberLastName + " worked " + shift.hoursWorked()  + " hours")
-    //Logger.log("date is: " + shift.start)
-    getMemberRow( shift.memberLastName )
-  })
+var memberRowMap = {}
+
+function insertHours() {
+  var shiftObjects = getShiftObjects(),
+    colToInsert = get7ShiftsColumn( getColumnFromUser() );
   
-  // TODO
-  // * Insert hours worked to proper cells
+  createMemberRowMap();
+  
+  shiftObjects.forEach( function( shift ) {
+    // Logger.log( "Member: " + shift.member.firstName + " " + shift.member.lastName + " worked " + shift.hoursWorked()  + " hours" )
+    // Logger.log( "date is: " + shift.start )
+    if ( memberRowMap[shift.member.lastName] ) {
+      updateCellValue( memberRowMap[shift.member.lastName], colToInsert, shift.hoursWorked() )
+    } else {
+     // SpreadsheetApp.getUi().alert( shift.member.lastName + ' Not Found!' )
+    }
+  }) 
 }
 
-function getMemberRow(memberLastName) {
+function createMemberRowMap() {
   var sheet = SpreadsheetApp.getActiveSheet();
   var data = sheet.getDataRange().getValues();
-  for (var i = 0; i < data.length; i++) {
-    if (data[i][2] == memberLastName) {
-      console.log('Row is: ' + ( i + 1 ));
-      break;
-    }
+  for ( var i = 0; i < data.length; i++ ) {
+    memberRowMap[data[i][2]] = i + 1;
   }
 }
 
-// This is an Google Apps Script for getting column number by column name
-// https://gist.github.com/printminion/5520691
+function getShiftObjects() {
+  var jsonObj = parseJSON( fetch7Shifts() ),
+    shiftObjectsArray = createShiftObjs( jsonObj );
+  return shiftObjectsArray;
+}
 
-// function to find row number based on cell value
-// https://stackoverflow.com/questions/24785987/google-apps-script-find-row-number-based-on-a-cell-value
+function updateCellValue( row, col, value ) {
+  var sheet = SpreadsheetApp.getActiveSheet().getRange( row, col );
+  var currentValue = parseInt( sheet.getValue() )
+  
+ sheet.setValue( currentValue + value );
+}
+
+function get7ShiftsColumn( columnName ) {
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var data = sheet.getDataRange().getValues();
+  return data[0].indexOf( columnName ) + 1;
+}
+
+function getColumnFromUser() {
+  var ui = SpreadsheetApp.getUi();
+  var response = ui.prompt( 'Please enter the Column Name to insert hours, e.g: 7Shifts' );
+  return response.getResponseText(); 
+}
