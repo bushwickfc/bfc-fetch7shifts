@@ -11,8 +11,6 @@ function insertHours() {
     // Logger.log( "date is: " + shift.start )
     if ( memberRowMap[shift.member.lastName] ) {
       updateCellValue( memberRowMap[shift.member.lastName], colToInsert, shift.hoursWorked() )
-    } else {
-     // SpreadsheetApp.getUi().alert( shift.member.lastName + ' Not Found!' )
     }
   }) 
 }
@@ -28,24 +26,27 @@ function createMemberRowMap() {
 function getShiftObjects() {
   var jsonObj = parseJSON( fetch7Shifts() ),
     shiftObjectsArray = createShiftObjs( jsonObj );
+  
   return shiftObjectsArray;
 }
 
 function updateCellValue( row, col, value ) {
   var sheet = SpreadsheetApp.getActiveSheet().getRange( row, col );
-  var currentValue = parseInt( sheet.getValue() )
+  var currentValue = parseInt( sheet.getValue() ) || 0;
   
- sheet.setValue( currentValue + value );
+  sheet.setValue( currentValue + value );
 }
 
 function get7ShiftsColumn( columnName ) {
   var sheet = SpreadsheetApp.getActiveSheet();
   var data = sheet.getDataRange().getValues();
+  
   return data[0].indexOf( columnName ) + 1;
 }
 
 function getColumnFromUser() {
   var ui = SpreadsheetApp.getUi();
   var response = ui.prompt( 'Please enter the Column Name to insert hours, e.g: 7Shifts' );
+  
   return response.getResponseText(); 
 }
