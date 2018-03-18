@@ -10,7 +10,7 @@ function fetch7Shifts() {
     "headers": headers
   };
   
-  // Make request to API and get response
+  // Build URL / Make request to API / get response
   var response = UrlFetchApp.fetch( buildURL(), params );
   
   return response
