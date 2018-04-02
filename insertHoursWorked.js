@@ -1,16 +1,19 @@
 var memberRowMap = {}
 
-function insertHours() {
-  var shiftObjects = getShiftObjects(),
-    colToInsert = get7ShiftsColumn( getColumnFromUser() );
-  
+function initDynamicInsert() {
   createMemberRowMap();
-  
-  shiftObjects.forEach( function( shift ) {
-    // Logger.log( "Member: " + shift.member.firstName + " " + shift.member.lastName + " worked " + shift.hoursWorked()  + " hours" )
-    // Logger.log( "date is: " + shift.start )
-    if ( memberRowMap[shift.member.lastName] ) {
-      updateCellValue( memberRowMap[shift.member.lastName], colToInsert, shift.hoursWorked() )
+  insertIntoSheet( getShiftObjects( getMonthFromUser() ), 
+                  get7ShiftsColumn( getColumnFromUser() ), 
+                  null );
+}
+
+function insertIntoSheet( data, colToInsert, objProperty ) { 
+  data.forEach( function( shift ) {
+    var memberName = shift.member.firstName + shift.member.lastName
+    if ( memberRowMap[memberName] ) {
+      updateCellValue( memberRowMap[memberName], 
+                       colToInsert, 
+                       shift.member[objProperty] || shift.hoursWorked() );
     }
   }) 
 }
