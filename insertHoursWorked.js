@@ -28,11 +28,13 @@ function insertIntoSheet( data, colToInsert, objProperty ) {
 
 function createMemberRowMap( colName ) {
   var sheet = SpreadsheetApp.getActiveSheet(),
-    data = sheet.getDataRange().getValues()
+    data = sheet.getDataRange().getValues(),
+    firstNameCol = getColumnIndex( 'FIRST NAME (OR HOUSEHOLD MEMBERS)' ) - 1,
+    lastNameCol = getColumnIndex( 'LAST NAME (OR HOUSEHOLD NAME)' ) - 1;
   
   for ( var i = 0; i < data.length; i++ ) {
-    var firstName = data[i][4],
-      lastName = data[i][3];
+    var firstName = data[i][firstNameCol],
+      lastName = data[i][lastNameCol];
     memberRowMap[firstName + lastName] = i + 1;
   }
 }
