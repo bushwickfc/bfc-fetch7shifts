@@ -3,14 +3,14 @@ var memberRowMap = {};
 function initDynamicInsert() {
   createMemberRowMap();
   insertIntoSheet( getShiftObjects( getMonthFromUser() ), 
-                  get7ShiftsColumn( getColumnFromUser() ), 
+                  getColumnIndex( getColumnFromUser() ), 
                   null );
 }
 
 function initAutomaticInsert() {
   createMemberRowMap();
   var currentMonth = parseInt( Utilities.formatDate( new Date(), 'EST', 'MM' )),
-      columnToInsert = get7ShiftsColumn( '7Shifts' + currentMonth );
+      columnToInsert = getColumnIndex( '7Shifts' + currentMonth );
   insertIntoSheet( getShiftObjects( currentMonth ), 
                    columnToInsert );
 }
@@ -59,7 +59,7 @@ function replaceCellValue( row, col, value ) {
   sheet.setValue( value );
 }
 
-function get7ShiftsColumn( columnName ) {
+function getColumnIndex( columnName ) {
   var sheet = SpreadsheetApp.getActiveSheet(),
     data = sheet.getDataRange().getValues();
   
